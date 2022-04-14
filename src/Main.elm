@@ -1,17 +1,18 @@
-module Main exposing (..)
+module Main exposing (main)
 
--- Press buttons to increment and decrement a counter.
+-- Input a user name and password. Make sure the password matches.
 --
 -- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
+--   https://guide.elm-lang.org/architecture/forms.html
 --
 
-
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-
-
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput,onClick)
+-- import Executor exposing (executor)
+-- import Lexer exposing (lexer)
+-- import Compiler exposing (compiler)
 
 -- MAIN
 
@@ -24,12 +25,15 @@ main =
 -- MODEL
 
 
-type alias Model = Int
+type alias Model =
+  { input : String
+  , output : String
+  }
 
 
 init : Model
 init =
-  0
+  Model "" ""
 
 
 
@@ -37,18 +41,17 @@ init =
 
 
 type Msg
-  = Increment
-  | Decrement
+  = Compile String
+  | Replace String
 
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Increment ->
-      model + 1
-
-    Decrement ->
-      model - 1
+    Compile str ->
+      { model | output = str }
+    Replace str ->
+      { model | input = str}
 
 
 
@@ -58,7 +61,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
-    ]
+        [ code [] [ pre [] [ text model.output ] ]
+        , input [ placeholder "Type here your brainfuck code", onInput Replace ] []
+        , button [ onClick (Compile model.input) ] [ text "Compile!" ]
+        ]
+
+-- compileCode : String -> String
+-- compileCode str = str
+  -- str |> lexer |> compiler |> executor |> String.concat
